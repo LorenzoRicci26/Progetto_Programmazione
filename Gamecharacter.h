@@ -11,7 +11,7 @@
 
 class Gamecharacter: public Subject{
 public:
-    Gamecharacter(int x,int y);
+    Gamecharacter(int x=0,int y=0);
 
     virtual ~Gamecharacter();
 
