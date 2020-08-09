@@ -10,6 +10,8 @@
 
 #include "stlastar.h" // See header for copyright and usage information
 #include "Subject.h"
+#include "TileMap.h"
+
 
 #include <iostream>
 #include <stdio.h>
@@ -30,9 +32,10 @@ using namespace std;
 const int MAP_WIDTH = 20;
 const int MAP_HEIGHT = 20;
 
-int world_map[ MAP_WIDTH * MAP_HEIGHT ] = 
-{
-        // 0001020304050607080910111213141516171819
+int world_map[ MAP_WIDTH * MAP_HEIGHT ] =
+        {
+
+// 0001020304050607080910111213141516171819
                 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,   // 00
                 1,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,1,   // 01
                 1,9,9,1,1,9,9,9,1,9,1,9,1,9,1,9,9,9,1,1,   // 02
@@ -54,7 +57,7 @@ int world_map[ MAP_WIDTH * MAP_HEIGHT ] =
                 1,9,1,1,1,1,1,1,1,1,1,9,1,1,1,1,1,1,1,1,   // 18
                 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,   // 19
 
-};
+        };
 
 // map helper functions
 
@@ -66,17 +69,15 @@ int GetMap( int x, int y )
 		 y >= MAP_HEIGHT
 	  )
 	{
-		return 9;	 
+		return 9;
 	}
 
 	return world_map[(y*MAP_WIDTH)+x];
 }
 
-
-
 // Definitions
 
-class MapSearchNode:public Subject
+class MapSearchNode
 {
 public:
 	int x;	 // the (x,y) positions of the node
@@ -92,15 +93,6 @@ public:
 	bool IsSameState( MapSearchNode &rhs );
 
 	void PrintNodeInfo();
-
-    void subscribe(Observer *o) override;
-
-    void unsubscribe(Observer *o) override;
-
-    void notify() override;
-
-private:
-    std::list<Observer*> observers;
 };
 
 bool MapSearchNode::IsSameState( MapSearchNode &rhs )
@@ -118,7 +110,6 @@ void MapSearchNode::PrintNodeInfo()
 	sprintf( str, "Node position : (%d,%d)\n", x,y );
 
 	cout << str;
-	notify();
 }
 
 // Here's the heuristic function that estimates the distance from a Node
@@ -204,113 +195,6 @@ float MapSearchNode::GetCost( MapSearchNode &successor )
 
 }
 
-void MapSearchNode::subscribe(Observer *o){
-    this->observers.push_back(o);
-
-}
-
-void MapSearchNode::unsubscribe(Observer *o) {
-    this->observers.remove(o);
-
-}
-
-void MapSearchNode::notify() {
-    for(auto observer:observers)
-    {
-        observer->update();
-    }
-
-}
-
-class TileMap: public Observer
-{
-public:
-    explicit TileMap(MapSearchNode* m,sf::RenderWindow* view):node(m),window(view)
-    {
-        //Init TileMap
-        tileMap.resize( MAP_WIDTH,std::vector<sf::RectangleShape>());
-
-        for (std::size_t i = 0 ; i<MAP_WIDTH ; i++)
-        {
-            tileMap[i].resize( MAP_WIDTH ,sf::RectangleShape());
-            for (std::size_t j = 0 ; j<MAP_HEIGHT ; j++)
-            {
-                //tileMap
-                tileMap[i][j].setSize(sf::Vector2f(50.f,50.f));
-                tileMap[i][j].setOutlineThickness(1.f);
-                tileMap[i][j].setFillColor(sf::Color::White);
-                tileMap[i][j].setOutlineColor(sf::Color::Black);
-                tileMap[i][j].setPosition(i * 50.f, j * 50.f);
-            }
-        }
-        attach();
-    }
-
-    ~TileMap()override
-    {
-        detach();
-    }
-
-    const vector<std::vector<sf::RectangleShape>> &getTileMap() const {
-        return tileMap;
-    }
-
-    void setNode(MapSearchNode *node) {
-        TileMap::node = node;
-    }
-
-    void attach()override
-    {
-        this->node->subscribe(this);
-    }
-
-    void detach()override
-    {
-        this->node->unsubscribe(this);
-    }
-
-    void update() override
-    {
-        this->x = this->node->x;
-        this->y = this->node->y;
-        show();
-    }
-
-    void show()
-    {
-        //Draw
-        for (int i=0; i<MAP_WIDTH; i++) {
-            for (int j = 0; j < MAP_HEIGHT; j++) {
-                //Check if in (i,j) position there is  a wall
-                if (GetMap(i, j) == 9) {
-                    this->tileMap[i][j].setFillColor(sf::Color::Cyan);
-                }
-
-                //Check if (i,j) is the hero's node
-                if (i == this->x && j == this->y) {
-                    this->tileMap[i][j].setFillColor(sf::Color::Green);
-                }
-                this->window->draw(this->tileMap[i][j]);
-            }
-        }
-
-        this->window->display();
-
-    }
-    std::vector<std::vector<sf::RectangleShape>> tileMap;
-private:
-    int x;
-    int y;
-    //Objects
-    MapSearchNode* node;
-
-    //SFML Objects
-    sf::RenderWindow* window;
-
-
-};
-
-
 // Main
 
 int main(  )
@@ -326,7 +210,7 @@ int main(  )
 
 	// Create an instance of the search class...
 
-	sf::RenderWindow window (sf::VideoMode(1000,1000),"AstarSearch",sf::Style::Titlebar | sf::Style::Close );
+	sf::RenderWindow window (sf::VideoMode(640,640),"AstarSearch",sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize);
 
     sf::Mouse mouse;
     sf::Vector2u mousePosGrid;
@@ -334,8 +218,7 @@ int main(  )
     sf::Vector2f mousePosView;
 
     sf::RectangleShape tileSelector;
-
-    tileSelector = sf::RectangleShape(sf::Vector2f(50.f,50.f));
+    tileSelector = sf::RectangleShape(sf::Vector2f(32.f,32.f));
     tileSelector.setFillColor(sf::Color::Transparent);
     tileSelector.setOutlineThickness(1.f);
     tileSelector.setOutlineColor(sf::Color::Red);
@@ -343,18 +226,20 @@ int main(  )
     int posX=0;
 	int posY=0;
 
+	Gamecharacter* hero = new Gamecharacter(posX,posY);
+
 	while (window.isOpen()) {
 	    sf::Event event;
         //Update mouse position
         mousePosWindow = sf::Mouse::getPosition(window);
         mousePosView = window.mapPixelToCoords(mousePosWindow);
         if(mousePosView.x >= 0)
-            mousePosGrid.x = static_cast<unsigned>(mousePosView.x) / 50.f ;
+            mousePosGrid.x = static_cast<unsigned>(mousePosView.x) / 32.f ;
         if(mousePosView.y >= 0)
-            mousePosGrid.y = static_cast<unsigned>(mousePosView.y) / 50.f ;
+            mousePosGrid.y = static_cast<unsigned>(mousePosView.y) / 32.f ;
 
         //Update tileselector
-        tileSelector.setPosition(mousePosGrid.x * 50.f, mousePosGrid.y * 50.f);
+        tileSelector.setPosition(mousePosGrid.x * 32.f, mousePosGrid.y * 32.f);
 
 	    while (window.pollEvent(event))
 	    {
@@ -455,16 +340,18 @@ int main(  )
                                     break;
                                 }
 
-                                TileMap map(node, &window);
+                                TileMap movement (hero,&window,world_map,MAP_WIDTH,MAP_HEIGHT);
 
                                 node->PrintNodeInfo();
+
+                                hero->setPosition(node->x,node->y);
 
                                 steps++;
 
                                 posX = node->x;
                                 posY = node->y;
 
-                                this_thread::sleep_for(chrono::milliseconds(100));
+                                this_thread::sleep_for(chrono::milliseconds(75));
 
                             };
 
@@ -488,20 +375,24 @@ int main(  )
                     }
             }
 	    }
-	    MapSearchNode mapSearchNode;
-	    TileMap newMap (&mapSearchNode,&window);
+
+        TileMap map (hero,&window,world_map,MAP_WIDTH,MAP_HEIGHT);
+
+        window.clear();
 
 	    for (int i=0;i<MAP_WIDTH;i++){
 	        for(int j=0;j<MAP_HEIGHT;j++){
+
+	            //For Walls
                 if (GetMap(i, j) == 9) {
-                    newMap.tileMap[i][j].setFillColor(sf::Color::Cyan);
+                    map.tileMap[i][j].setFillColor(sf::Color::Cyan);
                 }
 
                 //Check if (i,j) is the hero's node
                 if (i == posX && j == posY) {
-                    newMap.tileMap[i][j].setFillColor(sf::Color::Green);
+                    map.tileMap[i][j].setFillColor(sf::Color::Green);
                 }
-	            window.draw(newMap.getTileMap()[i][j]);
+	            window.draw(map.getTileMap()[i][j]);
 	        }
 	    }
 	    window.draw(tileSelector);
