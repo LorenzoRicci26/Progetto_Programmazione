@@ -12,10 +12,8 @@
 #include "Subject.h"
 #include "TileMap.h"
 
-
 #include <iostream>
 #include <stdio.h>
-#include <SFML/Graphics.hpp>
 #include <list>
 #include <thread>
 #include <chrono>

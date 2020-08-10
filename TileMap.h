@@ -10,11 +10,37 @@
 #include "Gamecharacter.h"
 #include <SFML/Graphics.hpp>
 
+
 class TileMap: public Observer{
 public:
     TileMap(Gamecharacter* g,sf::RenderWindow* window,int* tiles,int width,int height);
 
     virtual ~TileMap();
+
+    //Getter and Setter
+    int *getMap() const;
+
+    void setMap(int *map);
+
+    int getMWidth() const;
+
+    void setMWidth(int mWidth);
+
+    int getMHeight() const;
+
+    void setMHeight(int mHeight);
+
+    int getMX() const;
+
+    void setMX(int mX);
+
+    int getMY() const;
+
+    void setMY(int mY);
+
+    Gamecharacter *getGamecharacter() const;
+
+    void setGamecharacter(Gamecharacter *gamecharacter);
 
     void draw();
     int getMapPos(int x,int y);

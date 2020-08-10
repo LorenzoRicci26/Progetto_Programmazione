@@ -25,6 +25,7 @@ TileMap::TileMap(Gamecharacter* g,sf::RenderWindow* window,int *tiles, int width
 
 TileMap::~TileMap()
 {
+    delete this->gamecharacter;
     detach();
 }
 
@@ -84,6 +85,56 @@ int TileMap::getMapPos(int x, int y) {
 const std::vector<std::vector<sf::RectangleShape>> &TileMap::getTileMap() const {
     return tileMap;
 }
+
+int *TileMap::getMap() const {
+    return map;
+}
+
+void TileMap::setMap(int *map) {
+    TileMap::map = map;
+}
+
+int TileMap::getMWidth() const {
+    return m_width;
+}
+
+void TileMap::setMWidth(int mWidth) {
+    m_width = mWidth;
+}
+
+int TileMap::getMHeight() const {
+    return m_height;
+}
+
+void TileMap::setMHeight(int mHeight) {
+    m_height = mHeight;
+}
+
+int TileMap::getMX() const {
+    return m_x;
+}
+
+void TileMap::setMX(int mX) {
+    m_x = mX;
+}
+
+int TileMap::getMY() const {
+    return m_y;
+}
+
+void TileMap::setMY(int mY) {
+    m_y = mY;
+}
+
+Gamecharacter *TileMap::getGamecharacter() const {
+    return gamecharacter;
+}
+
+void TileMap::setGamecharacter(Gamecharacter *gamecharacter) {
+    TileMap::gamecharacter = gamecharacter;
+}
+
+
 
 
 
