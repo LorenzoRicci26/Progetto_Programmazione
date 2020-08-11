@@ -2,7 +2,9 @@
 // Created by Lorenzo Ricci on 09/08/2020.
 //
 
+
 #include "TileMap.h"
+
 
 TileMap::TileMap(Gamecharacter* g,sf::RenderWindow* window,int *tiles, int width, int height):gamecharacter(g),m_window(window),map(tiles),m_width(width),m_height(height)
 {
@@ -25,12 +27,18 @@ TileMap::TileMap(Gamecharacter* g,sf::RenderWindow* window,int *tiles, int width
 
 TileMap::~TileMap()
 {
-    delete this->gamecharacter;
     detach();
 }
 
 void TileMap::update()
 {
+    if(this->gamecharacter->getPosX() > this->m_width ||
+      this->gamecharacter->getPosY() > this->m_height ||
+      this->gamecharacter->getPosX() < 0 ||
+      this->gamecharacter->getPosY() < 0 )
+    {
+        throw std::out_of_range ("Coords are unreachable");
+    }
     this->m_x = gamecharacter->getPosX();
     this->m_y = gamecharacter->getPosY();
     draw();
@@ -38,6 +46,9 @@ void TileMap::update()
 
 void TileMap::attach()
 {
+    if(gamecharacter == nullptr){
+        throw std::runtime_error("Gamecharacter is not initialized");
+    }
     this->gamecharacter->subscribe(this);
 }
 
@@ -70,13 +81,10 @@ void TileMap::draw()
 }
 
 int TileMap::getMapPos(int x, int y) {
-    if( x < 0 ||
-        x >= this->m_width ||
-        y < 0 ||
-        y >= this->m_height
-            )
+    if( x < 0 || x >= this->m_width || y < 0 || y >= this->m_height)
     {
         return 9;
+        throw std::out_of_range("There is a wall or this point of the map is unreachable");
     }
 
     return this->map[(y*this->m_width)+x];
@@ -131,7 +139,7 @@ Gamecharacter *TileMap::getGamecharacter() const {
 }
 
 void TileMap::setGamecharacter(Gamecharacter *gamecharacter) {
-    TileMap::gamecharacter = gamecharacter;
+    this->gamecharacter = gamecharacter;
 }
 
 

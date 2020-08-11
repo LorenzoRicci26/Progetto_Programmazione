@@ -2,16 +2,12 @@
 // Created by Lorenzo Ricci on 09/08/2020.
 //
 
+#include <stdexcept>
 #include "Gamecharacter.h"
 
-Gamecharacter::Gamecharacter(int x, int y):posX(x),posY(y)
-{
+Gamecharacter::Gamecharacter(int x, int y):posX(x),posY(y){}
 
-}
-
-Gamecharacter::~Gamecharacter() {
-
-}
+Gamecharacter::~Gamecharacter() {}
 
 void Gamecharacter::subscribe(Observer *o)
 {
@@ -21,14 +17,12 @@ void Gamecharacter::subscribe(Observer *o)
 void Gamecharacter::unsubscribe(Observer *o)
 {
     this->observers.remove(o);
-
 }
 
 void Gamecharacter::notify()
 {
     for (auto observer : observers)
         observer->update();
-
 }
 
 int Gamecharacter::getPosX() const {
@@ -36,7 +30,7 @@ int Gamecharacter::getPosX() const {
 }
 
 void Gamecharacter::setPosX(int posX) {
-    Gamecharacter::posX = posX;
+    this->posX = posX;
     notify();
 }
 
@@ -45,7 +39,7 @@ int Gamecharacter::getPosY() const {
 }
 
 void Gamecharacter::setPosY(int posY) {
-    Gamecharacter::posY = posY;
+    this->posY = posY;
     notify();
 }
 

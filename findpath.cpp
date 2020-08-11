@@ -226,6 +226,8 @@ int main(  )
 
 	Gamecharacter* hero = new Gamecharacter(posX,posY);
 
+	Gamecharacter gamecharacter;
+
 	while (window.isOpen()) {
 	    sf::Event event;
         //Update mouse position
@@ -338,11 +340,18 @@ int main(  )
                                     break;
                                 }
 
-                                TileMap movement (hero,&window,world_map,MAP_WIDTH,MAP_HEIGHT);
+                                try {
+                                    TileMap movement (hero,&window,world_map,MAP_WIDTH,MAP_HEIGHT);
 
-                                node->PrintNodeInfo();
+                                    node->PrintNodeInfo();
 
-                                hero->setPosition(node->x,node->y);
+                                    hero->setPosition(node->x,node->y);
+
+                                } catch (std::runtime_error &e) {
+                                    std::cout<<e.what()<<std::endl;
+                                } catch (std::out_of_range &e) {
+                                    std::cout<<e.what()<<std::endl;
+                                }
 
                                 steps++;
 
@@ -360,7 +369,7 @@ int main(  )
 
                         } else if (SearchState == AStarSearch<MapSearchNode>::SEARCH_STATE_FAILED) {
                             cout << "Search terminated. Did not find goal state\n";
-
+                            cout << "The node goal is a wall or a point of the map unreachble"<<endl;
                         }
 
                         // Display the number of loops the search went through
@@ -371,6 +380,50 @@ int main(  )
                         astarsearch.EnsureMemoryFreed();
 	                    }
                     }
+                case sf::Event::Resized:
+                    break;
+                case sf::Event::LostFocus:
+                    break;
+                case sf::Event::GainedFocus:
+                    break;
+                case sf::Event::TextEntered:
+                    break;
+                case sf::Event::KeyPressed:
+                    break;
+                case sf::Event::KeyReleased:
+                    break;
+                case sf::Event::MouseWheelMoved:
+                    break;
+                case sf::Event::MouseWheelScrolled:
+                    break;
+                case sf::Event::MouseButtonReleased:
+                    break;
+                case sf::Event::MouseMoved:
+                    break;
+                case sf::Event::MouseEntered:
+                    break;
+                case sf::Event::MouseLeft:
+                    break;
+                case sf::Event::JoystickButtonPressed:
+                    break;
+                case sf::Event::JoystickButtonReleased:
+                    break;
+                case sf::Event::JoystickMoved:
+                    break;
+                case sf::Event::JoystickConnected:
+                    break;
+                case sf::Event::JoystickDisconnected:
+                    break;
+                case sf::Event::TouchBegan:
+                    break;
+                case sf::Event::TouchMoved:
+                    break;
+                case sf::Event::TouchEnded:
+                    break;
+                case sf::Event::SensorChanged:
+                    break;
+                case sf::Event::Count:
+                    break;
             }
 	    }
 

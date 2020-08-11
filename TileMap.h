@@ -13,7 +13,7 @@
 
 class TileMap: public Observer{
 public:
-    TileMap(Gamecharacter* g,sf::RenderWindow* window,int* tiles,int width,int height);
+    TileMap(Gamecharacter* g,sf::RenderWindow* window,int* tiles,int width=20,int height=20);
 
     virtual ~TileMap();
 

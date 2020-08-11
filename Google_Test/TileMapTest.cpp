@@ -36,10 +36,12 @@ TEST(TileMap , Constructor)
 {
     auto * gamecharacter = new Gamecharacter;
 
+    sf::RenderWindow window (sf::VideoMode(640,640),"AstarSearch", sf::Style::Close | sf::Style::Titlebar | sf::Style ::Resize);
+
     gamecharacter->setPosX(10);
     gamecharacter->setPosY(10);
 
-    TileMap map (gamecharacter, world_map);
+    TileMap map (gamecharacter,&window,world_map);
 
     ASSERT_EQ(20, map.getMWidth());
     ASSERT_EQ(20, map.getMHeight());
@@ -64,4 +66,33 @@ TEST(TileMap , Constructor)
     }
 
 
+}
+
+TEST(TileMap, getMapPos)
+{
+    auto * gamecharacter = new Gamecharacter;
+
+    sf::RenderWindow window (sf::VideoMode(640,640),"AstarSearch", sf::Style::Close | sf::Style::Titlebar | sf::Style ::Resize);
+
+    TileMap map(gamecharacter,&window,world_map);
+
+    //Check for a tile permitted
+    ASSERT_EQ(world_map[10*map.getMWidth()+5],map.getMapPos(5,10));
+
+    //Check for a wall
+    ASSERT_EQ(9,map.getMapPos(1,1));
+}
+
+TEST(TileMap, patternObserver)
+{
+    auto * gamecharacter = new Gamecharacter;
+
+    sf::RenderWindow window (sf::VideoMode(640,640),"AstarSearch", sf::Style::Close | sf::Style::Titlebar | sf::Style ::Resize);
+
+    TileMap map(gamecharacter,&window,world_map);
+
+    gamecharacter->setPosition(1,1);
+
+    ASSERT_EQ(1,map.getMX());
+    ASSERT_EQ(1,map.getMY());
 }

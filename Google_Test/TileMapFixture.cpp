@@ -10,10 +10,18 @@
 class TileMapSuite : public ::testing::Test{
 
 protected:
-    void SetUp(){
-
-
-
+    void SetUp()
+    {
+        map.setMWidth(10);
+        map.setMHeight(10);
+        map.setGamecharacter(c);
+        map.setMap(world_map);
+        map.setMX(0);
+        map.setMY(0);
     }
+
     TileMap map;
+    Gamecharacter* c;
+    int* world_map;
+    sf::RenderWindow* window;
 };
