@@ -8,6 +8,9 @@
 
 #include "Observer.h"
 
+
+//Interface
+//Abstract class
 class Subject
 {
 public:

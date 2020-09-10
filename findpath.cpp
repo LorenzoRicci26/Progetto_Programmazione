@@ -14,7 +14,6 @@
 
 #include <iostream>
 #include <stdio.h>
-#include <list>
 #include <thread>
 #include <chrono>
 
@@ -206,28 +205,35 @@ int main(  )
 	// in travelling (think ice rink if you can skate) whilst 5 represents the 
 	// most difficult. 9 indicates that we cannot pass.
 
-	// Create an instance of the search class...
-
+	//Create an instance for the application's window
 	sf::RenderWindow window (sf::VideoMode(640,640),"AstarSearch",sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize);
 
+	//Create a instance for the mouse
     sf::Mouse mouse;
     sf::Vector2u mousePosGrid;
     sf::Vector2i mousePosWindow;
     sf::Vector2f mousePosView;
 
+    //Create an instance for a rectangle that works as a tile selector
     sf::RectangleShape tileSelector;
     tileSelector = sf::RectangleShape(sf::Vector2f(32.f,32.f));
     tileSelector.setFillColor(sf::Color::Transparent);
     tileSelector.setOutlineThickness(1.f);
     tileSelector.setOutlineColor(sf::Color::Red);
 
+    //Create an instance for the audio
+    sf::SoundBuffer buffer;
+    sf::Sound sound;
+    buffer.loadFromFile("CLICK.wav");
+    sound.setBuffer(buffer);
+
     int posX=0;
 	int posY=0;
 
+	//Hero
 	Gamecharacter* hero = new Gamecharacter(posX,posY);
 
-	Gamecharacter gamecharacter;
-
+	//While loop for the app
 	while (window.isOpen()) {
 	    sf::Event event;
         //Update mouse position
@@ -252,6 +258,8 @@ int main(  )
 	            case sf::Event::MouseButtonPressed:
 	                if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
                     {
+
+                        // Create an instance of the search class...
 	                    AStarSearch<MapSearchNode> astarsearch;
 
 	                    unsigned int SearchCount = 0;
@@ -333,6 +341,7 @@ int main(  )
                             int steps = 0;
 
                             node->PrintNodeInfo();
+
                             for (;;) {
                                 node = astarsearch.GetSolutionNext();
 
@@ -349,8 +358,10 @@ int main(  )
 
                                 } catch (std::runtime_error &e) {
                                     std::cout<<e.what()<<std::endl;
+                                    break;
                                 } catch (std::out_of_range &e) {
                                     std::cout<<e.what()<<std::endl;
+                                    break;
                                 }
 
                                 steps++;
@@ -358,7 +369,9 @@ int main(  )
                                 posX = node->x;
                                 posY = node->y;
 
-                                this_thread::sleep_for(chrono::milliseconds(75));
+                                sound.play();
+
+                                this_thread::sleep_for(chrono::milliseconds(75)); //milliseconds between
 
                             };
 

@@ -5,6 +5,8 @@
 #ifndef UNTITLED_OBSERVER_H
 #define UNTITLED_OBSERVER_H
 
+//Interface
+//Abstract class
 class Observer
 {
 public:
