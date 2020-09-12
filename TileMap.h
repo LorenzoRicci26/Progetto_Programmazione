@@ -8,6 +8,7 @@
 
 #include "Observer.h"
 #include "Gamecharacter.h"
+#include "Utility.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 
@@ -16,7 +17,7 @@
 class TileMap: public Observer{
 public:
     //Constructor and Destructor
-    TileMap(Gamecharacter* g,sf::RenderWindow* window,int* tiles,int width=20,int height=20);
+    TileMap(Gamecharacter* g,sf::RenderWindow* window,Utility* u,int width=20,int height=20);
     virtual ~TileMap();
 
     //Getter and Setter
@@ -31,11 +32,11 @@ public:
     int getMY() const;
     void setMY(int mY);
     Gamecharacter *getGamecharacter() const;
+
     void setGamecharacter(Gamecharacter *gamecharacter);
 
     //Functions
     void draw();
-    int getMapPos(int x,int y);
 
     //Getter for the entire tilemap
     const std::vector<std::vector<sf::RectangleShape>> &getTileMap() const;
@@ -53,6 +54,7 @@ private:
     int m_height;
     int m_x,m_y;
     Gamecharacter* gamecharacter;
+    Utility* utility;
 
     //SFML objects
     sf::RenderWindow* m_window;

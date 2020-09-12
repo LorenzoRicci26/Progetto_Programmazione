@@ -41,6 +41,7 @@ using namespace std;
 
 // fast fixed size memory allocator, used for fast node memory management
 #include "fsa.h"
+#include "Utility.h"
 
 // Fixed size memory allocator can be disabled to compare performance
 // Uses std new and delete instead if you turn it off
@@ -118,7 +119,7 @@ public: // methods
 
 
 	// constructor just initialises private data
-	AStarSearch() :
+	AStarSearch(Utility* u) : utility(u),
 		m_State( SEARCH_STATE_NOT_INITIALISED ),
 		m_CurrentSolutionNode( NULL ),
 #if USE_FSA_MEMORY
@@ -261,7 +262,7 @@ public: // methods
 
 			// User provides this functions and uses AddSuccessor to add each successor of
 			// node 'n' to m_Successors
-			bool ret = n->m_UserState.GetSuccessors( this, n->parent ? &n->parent->m_UserState : NULL ); 
+			bool ret = n->m_UserState.GetSuccessors( utility,this, n->parent ? &n->parent->m_UserState : NULL );
 
 			if( !ret )
 			{
@@ -289,7 +290,7 @@ public: // methods
 			{
 
 				// 	The g value for this successor ...
-				float newg = n->g + n->m_UserState.GetCost( (*successor)->m_UserState );
+				float newg = n->g + n->m_UserState.GetCost( utility, (*successor)->m_UserState );
 
 				// Now we need to find whether the node is on the open or closed lists
 				// If it is but the node that is already on them is better (lower g)
@@ -777,6 +778,9 @@ private: // methods
 	}
 
 private: // data
+
+    //Contain the map
+    Utility* utility;
 
 	// Heap (simple vector but used as a heap, cf. Steve Rabin's game gems article)
 	vector< Node *> m_OpenList;

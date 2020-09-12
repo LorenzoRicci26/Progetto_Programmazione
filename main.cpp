@@ -8,12 +8,11 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "stlastar.h" // See header for copyright and usage information
+#include "MapSearchNode.h"
 #include "Subject.h"
 #include "TileMap.h"
 
 #include <iostream>
-#include <stdio.h>
 #include <thread>
 #include <chrono>
 
@@ -56,144 +55,8 @@ int world_map[ MAP_WIDTH * MAP_HEIGHT ] =
 
         };
 
-// map helper functions
-
-int GetMap( int x, int y )
-{
-	if( x < 0 ||
-	    x >= MAP_WIDTH ||
-		 y < 0 ||
-		 y >= MAP_HEIGHT
-	  )
-	{
-		return 9;
-	}
-
-	return world_map[(y*MAP_WIDTH)+x];
-}
-
-// Definitions
-
-class MapSearchNode
-{
-public:
-	int x;	 // the (x,y) positions of the node
-	int y;	
-	
-	MapSearchNode() { x = y = 0; }
-	MapSearchNode( int px, int py ) { x=px; y=py; }
-
-	float GoalDistanceEstimate( MapSearchNode &nodeGoal );
-	bool IsGoal( MapSearchNode &nodeGoal );
-	bool GetSuccessors( AStarSearch<MapSearchNode> *astarsearch, MapSearchNode *parent_node );
-	float GetCost( MapSearchNode &successor );
-	bool IsSameState( MapSearchNode &rhs );
-
-	void PrintNodeInfo();
-};
-
-bool MapSearchNode::IsSameState( MapSearchNode &rhs )
-{
-
-	// same state in a maze search is simply when (x,y) are the same
-    return (x == rhs.x) &&
-           (y == rhs.y);
-
-}
-
-void MapSearchNode::PrintNodeInfo()
-{
-	char str[100];
-	sprintf( str, "Node position : (%d,%d)\n", x,y );
-
-	cout << str;
-}
-
-// Here's the heuristic function that estimates the distance from a Node
-// to the Goal. 
-
-float MapSearchNode::GoalDistanceEstimate( MapSearchNode &nodeGoal )
-{
-	return abs(x - nodeGoal.x) + abs(y - nodeGoal.y);
-}
-
-bool MapSearchNode::IsGoal( MapSearchNode &nodeGoal )
-{
-
-    return (x == nodeGoal.x) &&
-           (y == nodeGoal.y);
-
-}
-
-// This generates the successors to the given Node. It uses a helper function called
-// AddSuccessor to give the successors to the AStar class. The A* specific initialisation
-// is done for each node internally, so here you just set the state information that
-// is specific to the application
-bool MapSearchNode::GetSuccessors( AStarSearch<MapSearchNode> *astarsearch, MapSearchNode *parent_node )
-{
-
-	int parent_x = -1; 
-	int parent_y = -1; 
-
-	if( parent_node )
-	{
-		parent_x = parent_node->x;
-		parent_y = parent_node->y;
-	}
-	
-
-	MapSearchNode NewNode;
-
-	// push each possible move except allowing the search to go backwards
-
-	if( (GetMap( x-1, y ) < 9) 
-		&& !((parent_x == x-1) && (parent_y == y))
-	  ) 
-	{
-		NewNode = MapSearchNode( x-1, y );
-		astarsearch->AddSuccessor( NewNode );
-	}	
-
-	if( (GetMap( x, y-1 ) < 9) 
-		&& !((parent_x == x) && (parent_y == y-1))
-	  ) 
-	{
-		NewNode = MapSearchNode( x, y-1 );
-		astarsearch->AddSuccessor( NewNode );
-	}	
-
-	if( (GetMap( x+1, y ) < 9)
-		&& !((parent_x == x+1) && (parent_y == y))
-	  ) 
-	{
-		NewNode = MapSearchNode( x+1, y );
-		astarsearch->AddSuccessor( NewNode );
-	}	
-
-		
-	if( (GetMap( x, y+1 ) < 9) 
-		&& !((parent_x == x) && (parent_y == y+1))
-		)
-	{
-		NewNode = MapSearchNode( x, y+1 );
-		astarsearch->AddSuccessor( NewNode );
-	}	
-
-	return true;
-}
-
-// given this node, what does it cost to move to successor. In the case
-// of our map the answer is the map terrain value at this node since that is 
-// conceptually where we're moving
-
-float MapSearchNode::GetCost( MapSearchNode &successor )
-{
-	return (float) GetMap( x, y );
-
-}
 
 // Main
-
 int main(  )
 {
 
@@ -205,11 +68,13 @@ int main(  )
 	// in travelling (think ice rink if you can skate) whilst 5 represents the 
 	// most difficult. 9 indicates that we cannot pass.
 
+	//Create an instance for utility object
+	Utility utility(world_map,MAP_WIDTH,MAP_HEIGHT);
+
 	//Create an instance for the application's window
 	sf::RenderWindow window (sf::VideoMode(640,640),"AstarSearch",sf::Style::Titlebar | sf::Style::Close | sf::Style::Resize);
 
-	//Create a instance for the mouse
-    sf::Mouse mouse;
+	//Create instances for the mouse position
     sf::Vector2u mousePosGrid;
     sf::Vector2i mousePosWindow;
     sf::Vector2f mousePosView;
@@ -230,7 +95,7 @@ int main(  )
     int posX=0;
 	int posY=0;
 
-	//Hero
+	//Create an Instance for a Hero
 	Gamecharacter* hero = new Gamecharacter(posX,posY);
 
 	//While loop for the app
@@ -260,7 +125,7 @@ int main(  )
                     {
 
                         // Create an instance of the search class...
-	                    AStarSearch<MapSearchNode> astarsearch;
+	                    AStarSearch<MapSearchNode> astarsearch (&utility);
 
 	                    unsigned int SearchCount = 0;
 
@@ -350,9 +215,7 @@ int main(  )
                                 }
 
                                 try {
-                                    TileMap movement (hero,&window,world_map,MAP_WIDTH,MAP_HEIGHT);
-
-                                    node->PrintNodeInfo();
+                                    TileMap movement (hero,&window,&utility,MAP_WIDTH,MAP_HEIGHT);
 
                                     hero->setPosition(node->x,node->y);
 
@@ -364,16 +227,18 @@ int main(  )
                                     break;
                                 }
 
+                                node->PrintNodeInfo();
+
                                 steps++;
 
                                 posX = node->x;
                                 posY = node->y;
 
-                                sound.play();
+                                //if sound play here
 
                                 this_thread::sleep_for(chrono::milliseconds(75)); //milliseconds between
 
-                            };
+                            }
 
                             cout << "Solution steps " << steps << endl;
 
@@ -440,7 +305,7 @@ int main(  )
             }
 	    }
 
-        TileMap map (hero,&window,world_map,MAP_WIDTH,MAP_HEIGHT);
+        TileMap map (hero,&window,&utility,MAP_WIDTH,MAP_HEIGHT);
 
         window.clear();
 
@@ -448,7 +313,7 @@ int main(  )
 	        for(int j=0;j<MAP_HEIGHT;j++){
 
 	            //For Walls
-                if (GetMap(i, j) == 9) {
+                if (utility.GetMap(i, j) == 9) {
                     map.tileMap[i][j].setFillColor(sf::Color::Cyan);
                 }
 

@@ -6,7 +6,7 @@
 #include "TileMap.h"
 
 //Constructor and Destructor
-TileMap::TileMap(Gamecharacter* g,sf::RenderWindow* window,int *tiles, int width, int height):gamecharacter(g),m_window(window),map(tiles),m_width(width),m_height(height)
+TileMap::TileMap(Gamecharacter* g,sf::RenderWindow* window,Utility* u, int width, int height):gamecharacter(g),m_window(window),utility(u),m_width(width),m_height(height)
 {
     //Init TileMap
     tileMap.resize(this->m_width, std::vector<sf::RectangleShape>());
@@ -91,9 +91,8 @@ void TileMap::draw()
         for (int j = 0; j < this->m_height; j++) {
 
             //Check if in (i,j) position there is  a wall
-            if (getMapPos(i, j) == 9) {
+            if (this->utility->GetMap(i,j)==9) {
                 this->tileMap[i][j].setFillColor(sf::Color::Cyan);
-
             }
 
             //Check if (i,j) is the hero's node
@@ -105,15 +104,6 @@ void TileMap::draw()
     }
     this->m_window->display();
 }
-
-int TileMap::getMapPos(int x, int y) {
-    if( x < 0 || x >= this->m_width || y < 0 || y >= this->m_height)
-    {
-        return 9;
-    }
-    return this->map[(y*this->m_width)+x];
-}
-
 
 //Override Functions
 void TileMap::update()

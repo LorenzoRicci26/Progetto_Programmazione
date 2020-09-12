@@ -14,8 +14,8 @@ int Gamecharacter::getPosX() const {
     return posX;
 }
 
-void Gamecharacter::setPosX(int posX) {
-    this->posX = posX;
+void Gamecharacter::setPosX(int _posX) {
+    this->posX = _posX;
     notify();
 }
 
@@ -23,8 +23,8 @@ int Gamecharacter::getPosY() const {
     return posY;
 }
 
-void Gamecharacter::setPosY(int posY) {
-    this->posY = posY;
+void Gamecharacter::setPosY(int _posY) {
+    this->posY = _posY;
     notify();
 }
 
